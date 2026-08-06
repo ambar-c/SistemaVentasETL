@@ -1,0 +1,146 @@
+<mxfile host="app.diagrams.net">
+  <diagram name="Página-1" id="ev21cxHUz2pcqpHvyyuv">
+    <mxGraphModel grid="1" page="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="gGsu4vh_XU0v19CdUmxE-23" edge="1" parent="1" source="gGsu4vh_XU0v19CdUmxE-2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.003;entryY=0.181;entryDx=0;entryDy=0;entryPerimeter=0;" target="gGsu4vh_XU0v19CdUmxE-6" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="gGsu4vh_XU0v19CdUmxE-2" parent="1" style="rounded=1;whiteSpace=wrap;html=1;" value="&lt;div&gt;&lt;b&gt;Archivos CSV&lt;/b&gt;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;products.csv&lt;/div&gt;&lt;div&gt;customers.csv&lt;/div&gt;&lt;div&gt;orders.csv&lt;/div&gt;&lt;div&gt;order_details.csv&lt;/div&gt;" vertex="1">
+          <mxGeometry height="110" width="130" x="-510" y="225" as="geometry" />
+        </mxCell>
+        <mxCell id="gGsu4vh_XU0v19CdUmxE-21" edge="1" parent="1" source="gGsu4vh_XU0v19CdUmxE-4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="gGsu4vh_XU0v19CdUmxE-6">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="gGsu4vh_XU0v19CdUmxE-4" parent="1" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;" value="&lt;div&gt;&lt;b&gt;Base de Datos Relacional&lt;/b&gt;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;SQL Server&lt;/div&gt;&lt;div&gt;VentasTransaccional&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;dbo.Pedidos&lt;/div&gt;&lt;div&gt;dbo.DetallesPedido&lt;/div&gt;" vertex="1">
+          <mxGeometry height="160" width="140" x="-510" y="362.5" as="geometry" />
+        </mxCell>
+        <mxCell id="gGsu4vh_XU0v19CdUmxE-5" parent="1" style="ellipse;shape=cloud;whiteSpace=wrap;html=1;" value="&lt;div&gt;&lt;b&gt;API REST Externa&lt;/b&gt;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;DummyJSON&lt;/div&gt;&lt;div&gt;/products&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;Productos actualizados&lt;/div&gt;" vertex="1">
+          <mxGeometry height="160" width="215" x="-560" y="535" as="geometry" />
+        </mxCell>
+        <mxCell id="gGsu4vh_XU0v19CdUmxE-6" parent="1" style="rounded=1;whiteSpace=wrap;html=1;" value="" vertex="1">
+          <mxGeometry height="505" width="470" x="-305" y="190" as="geometry" />
+        </mxCell>
+        <mxCell id="gGsu4vh_XU0v19CdUmxE-26" edge="1" parent="1" source="gGsu4vh_XU0v19CdUmxE-8" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" target="gGsu4vh_XU0v19CdUmxE-11">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="gGsu4vh_XU0v19CdUmxE-8" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;shadow=1;" value="&lt;div&gt;&lt;b&gt;CsvExtractor&amp;lt;T&amp;gt;&lt;/b&gt;&lt;/div&gt;&lt;div&gt;CsvHelper&lt;/div&gt;" vertex="1">
+          <mxGeometry height="60" width="100" x="-285" y="250" as="geometry" />
+        </mxCell>
+        <mxCell id="gGsu4vh_XU0v19CdUmxE-25" edge="1" parent="1" source="gGsu4vh_XU0v19CdUmxE-9" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" target="gGsu4vh_XU0v19CdUmxE-11">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="gGsu4vh_XU0v19CdUmxE-9" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" value="&lt;div&gt;&lt;b&gt;DatabaseExtractor&amp;lt;T&amp;gt;&lt;/b&gt;&lt;/div&gt;&lt;div&gt;Microsoft.Data.SqlClient&lt;/div&gt;" vertex="1">
+          <mxGeometry height="60" width="175" x="-165" y="250" as="geometry" />
+        </mxCell>
+        <mxCell id="gGsu4vh_XU0v19CdUmxE-10" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" value="&lt;div&gt;&lt;b&gt;ApiExtractor&lt;/b&gt;&lt;/div&gt;&lt;div&gt;IHttpClientFactory&lt;/div&gt;" vertex="1">
+          <mxGeometry height="60" width="115" x="30" y="250" as="geometry" />
+        </mxCell>
+        <mxCell id="gGsu4vh_XU0v19CdUmxE-11" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;" value="&lt;div&gt;&lt;b&gt;IExtractor&amp;lt;T&amp;gt;&lt;/b&gt;&lt;/div&gt;&lt;div&gt;Abstracción de las fuentes&lt;/div&gt;" vertex="1">
+          <mxGeometry height="60" width="162.5" x="-225" y="370" as="geometry" />
+        </mxCell>
+        <mxCell id="gGsu4vh_XU0v19CdUmxE-12" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" value="&lt;div&gt;&lt;b&gt;Worker.cs&lt;/b&gt;&lt;/div&gt;&lt;div&gt;Task.WhenAll&lt;/div&gt;&lt;div&gt;Procesamiento asíncrono y paralelo&lt;/div&gt;" vertex="1">
+          <mxGeometry height="60" width="175" x="-231.25" y="470" as="geometry" />
+        </mxCell>
+        <mxCell id="gGsu4vh_XU0v19CdUmxE-13" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" value="&lt;div&gt;&lt;b&gt;StagingWriter&lt;/b&gt;&lt;/div&gt;&lt;div&gt;SqlBulkCopy&lt;/div&gt;&lt;div&gt;Carga masiva&lt;/div&gt;" vertex="1">
+          <mxGeometry height="80" width="175" x="-231.25" y="570" as="geometry" />
+        </mxCell>
+        <mxCell id="gGsu4vh_XU0v19CdUmxE-15" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" value="&lt;div&gt;&lt;b&gt;appsettings.json&lt;/b&gt;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;Rutas&lt;/div&gt;&lt;div&gt;Conexiones&lt;/div&gt;&lt;div&gt;URL de la API&lt;/div&gt;" vertex="1">
+          <mxGeometry height="70" width="120" x="19" y="380" as="geometry" />
+        </mxCell>
+        <mxCell id="gGsu4vh_XU0v19CdUmxE-16" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" value="&lt;div&gt;&lt;b&gt;ILogger + Stopwatch&lt;/b&gt;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;Logs&lt;/div&gt;&lt;div&gt;Errores&lt;/div&gt;&lt;div&gt;Métricas de rendimiento&lt;/div&gt;" vertex="1">
+          <mxGeometry height="90" width="130" x="10" y="490" as="geometry" />
+        </mxCell>
+        <mxCell id="gGsu4vh_XU0v19CdUmxE-19" edge="1" parent="1" source="gGsu4vh_XU0v19CdUmxE-5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.011;entryY=0.842;entryDx=0;entryDy=0;entryPerimeter=0;exitX=0.875;exitY=0.5;exitDx=0;exitDy=0;exitPerimeter=0;" target="gGsu4vh_XU0v19CdUmxE-6">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="gGsu4vh_XU0v19CdUmxE-28" edge="1" parent="1" style="endArrow=classic;html=1;rounded=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="gGsu4vh_XU0v19CdUmxE-11" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="-143.75" y="340" as="sourcePoint" />
+            <mxPoint x="-125" y="300" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="gGsu4vh_XU0v19CdUmxE-29" edge="1" parent="1" style="endArrow=none;html=1;rounded=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;edgeStyle=orthogonalEdgeStyle;" target="gGsu4vh_XU0v19CdUmxE-10" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <Array as="points">
+              <mxPoint x="-163.95" y="350.05" />
+              <mxPoint x="-163.95" y="330.05" />
+              <mxPoint x="95" y="330.05" />
+              <mxPoint x="95" y="310.05" />
+            </Array>
+            <mxPoint x="-145" y="360" as="sourcePoint" />
+            <mxPoint x="-125" y="300" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="gGsu4vh_XU0v19CdUmxE-31" edge="1" parent="1" source="gGsu4vh_XU0v19CdUmxE-11" style="endArrow=classic;html=1;rounded=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" target="gGsu4vh_XU0v19CdUmxE-12" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="-175" y="450" as="sourcePoint" />
+            <mxPoint x="-125" y="400" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="gGsu4vh_XU0v19CdUmxE-34" edge="1" parent="1" source="gGsu4vh_XU0v19CdUmxE-12" style="endArrow=classic;html=1;rounded=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" target="gGsu4vh_XU0v19CdUmxE-13" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="-175" y="450" as="sourcePoint" />
+            <mxPoint x="-125" y="400" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="gGsu4vh_XU0v19CdUmxE-36" parent="1" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#dae8fc;strokeColor=#6c8ebf;" value="" vertex="1">
+          <mxGeometry height="340" width="200" x="220" y="320" as="geometry" />
+        </mxCell>
+        <mxCell id="gGsu4vh_XU0v19CdUmxE-41" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" value="&lt;div&gt;&lt;ul&gt;&lt;li&gt;stg.Productos&lt;/li&gt;&lt;li&gt;stg.Clientes&lt;/li&gt;&lt;li&gt;stg.Ordenes&lt;/li&gt;&lt;li&gt;stg.DetallesOrden&lt;/li&gt;&lt;li&gt;stg.PedidosBD&lt;/li&gt;&lt;li&gt;stg.DetallesPedidoBD&lt;/li&gt;&lt;li&gt;stg.ProductosAPI&lt;/li&gt;&lt;/ul&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="142.5" width="162.5" x="238.75" y="500" as="geometry" />
+        </mxCell>
+        <mxCell id="gGsu4vh_XU0v19CdUmxE-42" parent="1" style="text;html=1;whiteSpace=wrap;overflow=hidden;rounded=0;" value="&lt;h1 style=&quot;margin-top: 0px;&quot;&gt;&lt;div style=&quot;text-align: center;&quot;&gt;&lt;span style=&quot;font-size: 16px; background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;SQL Server&lt;/span&gt;&lt;/div&gt;&lt;font style=&quot;font-size: 16px;&quot;&gt;&lt;div style=&quot;text-align: center;&quot;&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;DW_SistemaVentas&lt;/span&gt;&lt;/div&gt;&lt;/font&gt;&lt;/h1&gt;&lt;p style=&quot;text-align: center;&quot;&gt;Esquema stg&lt;br/&gt;Filegroup FG_STAGING&lt;/p&gt;" vertex="1">
+          <mxGeometry height="130" width="162.5" x="238.75" y="360" as="geometry" />
+        </mxCell>
+        <mxCell id="gGsu4vh_XU0v19CdUmxE-44" edge="1" parent="1" source="gGsu4vh_XU0v19CdUmxE-41" style="endArrow=none;html=1;rounded=0;entryX=1;entryY=1;entryDx=0;entryDy=0;exitX=0.026;exitY=-0.066;exitDx=0;exitDy=0;exitPerimeter=0;" target="gGsu4vh_XU0v19CdUmxE-42" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="-30" y="530" as="sourcePoint" />
+            <mxPoint x="20" y="480" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="gGsu4vh_XU0v19CdUmxE-45" edge="1" parent="1" source="gGsu4vh_XU0v19CdUmxE-13" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=-0.021;entryY=0.855;entryDx=0;entryDy=0;entryPerimeter=0;" target="gGsu4vh_XU0v19CdUmxE-36">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="gGsu4vh_XU0v19CdUmxE-46" parent="1" style="text;html=1;whiteSpace=wrap;overflow=hidden;rounded=0;align=center;" value="&lt;h1 style=&quot;margin-top: 0px;&quot;&gt;Arquitectura Base del Proceso de Extracción ETL&lt;br&gt;Sistema de Análisis de Ventas&lt;/h1&gt;&lt;p&gt;&lt;br&gt;&lt;/p&gt;" vertex="1">
+          <mxGeometry height="70" width="595" x="-367.5" y="90" as="geometry" />
+        </mxCell>
+        <mxCell id="gGsu4vh_XU0v19CdUmxE-47" parent="1" style="text;html=1;whiteSpace=wrap;overflow=hidden;rounded=0;align=center;" value="&lt;h1 style=&quot;margin-top: 0px;&quot;&gt;&lt;font style=&quot;font-size: 15px;&quot;&gt;Worker Service – .NET 8&lt;br&gt;SistemaVentasETL&lt;/font&gt;&lt;/h1&gt;" vertex="1">
+          <mxGeometry height="60" width="227" x="-183.5" y="180" as="geometry" />
+        </mxCell>
+        <mxCell id="Em_M58dDwJshpBvcszxz-1" parent="1" style="rounded=0;whiteSpace=wrap;html=1;dashed=1;dashPattern=8 8;" value="&lt;b&gt;&lt;font style=&quot;font-size: 13px;&quot;&gt;Transformación y limpieza&lt;br&gt;&lt;/font&gt;&lt;/b&gt;&lt;br&gt;Validación&lt;br&gt;Normalización&lt;br&gt;Eliminación de duplicados&lt;br&gt;Cálculo de totales" vertex="1">
+          <mxGeometry height="110" width="215" x="520" y="345" as="geometry" />
+        </mxCell>
+        <mxCell id="Em_M58dDwJshpBvcszxz-2" parent="1" style="rounded=0;whiteSpace=wrap;html=1;dashed=1;dashPattern=8 8;" value="&lt;b&gt;&lt;font style=&quot;font-size: 13px;&quot;&gt;Modelo Analítico&lt;br&gt;&lt;/font&gt;&lt;/b&gt;&lt;br&gt;Dimensiones&lt;br&gt;FactVenta" vertex="1">
+          <mxGeometry height="80" width="215" x="520" y="475" as="geometry" />
+        </mxCell>
+        <mxCell id="Em_M58dDwJshpBvcszxz-3" parent="1" style="rounded=0;whiteSpace=wrap;html=1;dashed=1;dashPattern=8 8;" value="&lt;b&gt;&lt;font style=&quot;font-size: 13px;&quot;&gt;Dashboard&lt;br&gt;&lt;/font&gt;&lt;/b&gt;&lt;br&gt;Power BI o ASP.NET Core&lt;br&gt;KPIs y reportes" vertex="1">
+          <mxGeometry height="90" width="215" x="520" y="585" as="geometry" />
+        </mxCell>
+        <mxCell id="Em_M58dDwJshpBvcszxz-12" edge="1" parent="1" source="Em_M58dDwJshpBvcszxz-3" style="endArrow=classicThin;html=1;rounded=0;edgeStyle=orthogonalEdgeStyle;exitX=0;exitY=0.5;exitDx=0;exitDy=0;endFill=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;startArrow=classic;startFill=1;dashed=1;dashPattern=8 8;" target="Em_M58dDwJshpBvcszxz-1" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <Array as="points">
+              <mxPoint x="470" y="630.08" />
+              <mxPoint x="470" y="400.08" />
+            </Array>
+            <mxPoint x="470" y="645" as="sourcePoint" />
+            <mxPoint x="470" y="395" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Em_M58dDwJshpBvcszxz-13" edge="1" parent="1" style="endArrow=classic;html=1;rounded=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;dashed=1;dashPattern=8 8;" target="Em_M58dDwJshpBvcszxz-2" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="470" y="515" as="sourcePoint" />
+            <mxPoint x="380" y="475" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Em_M58dDwJshpBvcszxz-14" parent="1" style="text;html=1;whiteSpace=wrap;overflow=hidden;rounded=0;align=center;" value="&lt;h1 style=&quot;margin-top: 0px;&quot;&gt;&lt;font style=&quot;font-size: 16px;&quot;&gt;Etapas posteriores del proyecto&lt;/font&gt;&lt;/h1&gt;" vertex="1">
+          <mxGeometry height="80" width="150" x="552.5" y="270" as="geometry" />
+        </mxCell>
+        <mxCell id="Em_M58dDwJshpBvcszxz-15" parent="1" style="text;html=1;whiteSpace=wrap;overflow=hidden;rounded=0;fillColor=#eeeeee;strokeColor=#36393d;" value="&lt;h1 style=&quot;margin-top: 0px;&quot;&gt;Leyenda:&lt;/h1&gt;&lt;p&gt;Línea continua: flujo implementado&lt;/p&gt;&lt;p&gt;Línea punteada: fases posteriores&lt;/p&gt;" vertex="1">
+          <mxGeometry height="100" width="200" x="205" y="710" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
