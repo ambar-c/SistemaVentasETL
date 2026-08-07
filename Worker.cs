@@ -24,8 +24,12 @@ public class Worker : BackgroundService
     // Extractor de la API REST
     private readonly IExtractor<ApiProduct> _apiProductExtractor;
 
+    // Servicios de carga
     private readonly IStagingWriter _stagingWriter;
-    private readonly IHostApplicationLifetime _hostApplicationLifetime;
+    private readonly IDimensionLoader _dimensionLoader;
+
+    private readonly IHostApplicationLifetime
+        _hostApplicationLifetime;
 
     public Worker(
         ILogger<Worker> logger,
@@ -34,9 +38,11 @@ public class Worker : BackgroundService
         IExtractor<Order> orderExtractor,
         IExtractor<OrderDetail> orderDetailExtractor,
         IExtractor<HistoricalOrder> historicalOrderExtractor,
-        IExtractor<HistoricalOrderDetail> historicalOrderDetailExtractor,
+        IExtractor<HistoricalOrderDetail>
+            historicalOrderDetailExtractor,
         IExtractor<ApiProduct> apiProductExtractor,
         IStagingWriter stagingWriter,
+        IDimensionLoader dimensionLoader,
         IHostApplicationLifetime hostApplicationLifetime)
     {
         _logger = logger;
@@ -46,14 +52,19 @@ public class Worker : BackgroundService
         _orderExtractor = orderExtractor;
         _orderDetailExtractor = orderDetailExtractor;
 
-        _historicalOrderExtractor = historicalOrderExtractor;
+        _historicalOrderExtractor =
+            historicalOrderExtractor;
+
         _historicalOrderDetailExtractor =
             historicalOrderDetailExtractor;
 
         _apiProductExtractor = apiProductExtractor;
 
         _stagingWriter = stagingWriter;
-        _hostApplicationLifetime = hostApplicationLifetime;
+        _dimensionLoader = dimensionLoader;
+
+        _hostApplicationLifetime =
+            hostApplicationLifetime;
     }
 
     protected override async Task ExecuteAsync(
@@ -62,26 +73,36 @@ public class Worker : BackgroundService
         var totalStopwatch = Stopwatch.StartNew();
 
         _logger.LogInformation(
-            "Iniciando extracción desde CSV, base de datos y API REST.");
+            "Iniciando proceso ETL desde CSV, base de datos y API REST.");
 
         try
         {
-            var extractionStopwatch = Stopwatch.StartNew();
+            /* =================================================
+               1. EXTRACCIÓN
+               ================================================= */
+
+            var extractionStopwatch =
+                Stopwatch.StartNew();
 
             // Extracción desde archivos CSV
             Task<IReadOnlyList<Product>> productsTask =
-                _productExtractor.ExtractAsync(stoppingToken);
+                _productExtractor.ExtractAsync(
+                    stoppingToken);
 
             Task<IReadOnlyList<Customer>> customersTask =
-                _customerExtractor.ExtractAsync(stoppingToken);
+                _customerExtractor.ExtractAsync(
+                    stoppingToken);
 
             Task<IReadOnlyList<Order>> ordersTask =
-                _orderExtractor.ExtractAsync(stoppingToken);
+                _orderExtractor.ExtractAsync(
+                    stoppingToken);
 
-            Task<IReadOnlyList<OrderDetail>> orderDetailsTask =
-                _orderDetailExtractor.ExtractAsync(stoppingToken);
+            Task<IReadOnlyList<OrderDetail>>
+                orderDetailsTask =
+                    _orderDetailExtractor.ExtractAsync(
+                        stoppingToken);
 
-            // Extracción desde VentasTransaccional
+            // Extracción desde la base de datos relacional
             Task<IReadOnlyList<HistoricalOrder>>
                 historicalOrdersTask =
                     _historicalOrderExtractor.ExtractAsync(
@@ -89,12 +110,14 @@ public class Worker : BackgroundService
 
             Task<IReadOnlyList<HistoricalOrderDetail>>
                 historicalOrderDetailsTask =
-                    _historicalOrderDetailExtractor.ExtractAsync(
-                        stoppingToken);
+                    _historicalOrderDetailExtractor
+                        .ExtractAsync(stoppingToken);
 
             // Extracción desde la API REST
-            Task<IReadOnlyList<ApiProduct>> apiProductsTask =
-                _apiProductExtractor.ExtractAsync(stoppingToken);
+            Task<IReadOnlyList<ApiProduct>>
+                apiProductsTask =
+                    _apiProductExtractor.ExtractAsync(
+                        stoppingToken);
 
             // Las siete extracciones se ejecutan simultáneamente
             await Task.WhenAll(
@@ -118,8 +141,9 @@ public class Worker : BackgroundService
             IReadOnlyList<OrderDetail> orderDetails =
                 await orderDetailsTask;
 
-            IReadOnlyList<HistoricalOrder> historicalOrders =
-                await historicalOrdersTask;
+            IReadOnlyList<HistoricalOrder>
+                historicalOrders =
+                    await historicalOrdersTask;
 
             IReadOnlyList<HistoricalOrderDetail>
                 historicalOrderDetails =
@@ -131,7 +155,7 @@ public class Worker : BackgroundService
             extractionStopwatch.Stop();
 
             _logger.LogInformation(
-                "Extracción de las tres fuentes completada en {ElapsedMilliseconds} ms.",
+                "Extracción completada en {ElapsedMilliseconds} ms.",
                 extractionStopwatch.ElapsedMilliseconds);
 
             _logger.LogInformation(
@@ -162,7 +186,13 @@ public class Worker : BackgroundService
                 "API - Productos extraídos: {Count}.",
                 apiProducts.Count);
 
-            var stagingStopwatch = Stopwatch.StartNew();
+
+            /* =================================================
+               2. CARGA EN STAGING
+               ================================================= */
+
+            var stagingStopwatch =
+                Stopwatch.StartNew();
 
             // Carga de los CSV
             Task productsLoadTask =
@@ -185,7 +215,7 @@ public class Worker : BackgroundService
                     orderDetails,
                     stoppingToken);
 
-            // Carga de la base relacional
+            // Carga de la base de datos relacional
             Task historicalOrdersLoadTask =
                 _stagingWriter.WriteAsync(
                     historicalOrders,
@@ -202,7 +232,7 @@ public class Worker : BackgroundService
                     apiProducts,
                     stoppingToken);
 
-            // Las siete cargas usan tablas distintas
+            // Cada carga utiliza una tabla staging diferente
             await Task.WhenAll(
                 productsLoadTask,
                 customersLoadTask,
@@ -213,32 +243,60 @@ public class Worker : BackgroundService
                 apiProductsLoadTask);
 
             stagingStopwatch.Stop();
+
+            _logger.LogInformation(
+                "Carga de staging completada en {ElapsedMilliseconds} ms.",
+                stagingStopwatch.ElapsedMilliseconds);
+
+
+            /* =================================================
+               3. TRANSFORMACIÓN Y CARGA DE DIMENSIONES
+               ================================================= */
+
+            var dimensionsStopwatch =
+                Stopwatch.StartNew();
+
+            _logger.LogInformation(
+                "Iniciando transformación y carga de dimensiones.");
+
+            await _dimensionLoader.LoadDimensionsAsync(
+                stoppingToken);
+
+            dimensionsStopwatch.Stop();
+
+            _logger.LogInformation(
+                "Transformación y carga de dimensiones completada en {ElapsedMilliseconds} ms.",
+                dimensionsStopwatch.ElapsedMilliseconds);
+
+
+            /* =================================================
+               4. FINALIZACIÓN
+               ================================================= */
+
             totalStopwatch.Stop();
 
             _logger.LogInformation(
-                "Carga de las tres fuentes en staging completada en {ElapsedMilliseconds} ms.",
-                stagingStopwatch.ElapsedMilliseconds);
-
-            _logger.LogInformation(
-                "Proceso ETL de extracción finalizado correctamente en {ElapsedMilliseconds} ms.",
+                "Proceso ETL completo finalizado correctamente en {ElapsedMilliseconds} ms.",
                 totalStopwatch.ElapsedMilliseconds);
         }
         catch (OperationCanceledException)
             when (stoppingToken.IsCancellationRequested)
         {
             _logger.LogWarning(
-                "El proceso de extracción fue cancelado.");
+                "El proceso ETL fue cancelado.");
         }
         catch (Exception ex)
         {
             _logger.LogError(
                 ex,
-                "Ocurrió un error durante la extracción o carga en staging.");
+                "Ocurrió un error durante el proceso ETL.");
         }
         finally
         {
             totalStopwatch.Stop();
-            _hostApplicationLifetime.StopApplication();
+
+            _hostApplicationLifetime
+                .StopApplication();
         }
     }
 }

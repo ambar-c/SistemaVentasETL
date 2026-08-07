@@ -43,6 +43,9 @@ builder.Services.AddSingleton<
 // Servicio encargado de escribir en las tablas staging
 builder.Services.AddSingleton<IStagingWriter, StagingWriter>();
 
+// Servicio encargado de cargar las dimensiones
+builder.Services.AddSingleton<IDimensionLoader, DimensionLoader>();
+
 // Worker Service
 builder.Services.AddHostedService<Worker>();
 
