@@ -1,124 +1,249 @@
-\# Sistema de Análisis de Ventas con Proceso ETL
+# Sistema de Análisis de Ventas con Proceso ETL
 
+Este proyecto implementa la arquitectura y el proceso ETL multifuente de un Sistema de Análisis de Ventas mediante un Worker Service desarrollado en .NET 8 y SQL Server.
 
+## Fuentes de datos
 
-Este proyecto implementa la arquitectura base y el proceso de extracción de un sistema ETL multifuente mediante un Worker Service desarrollado en .NET 8.
+- Archivos CSV: productos, clientes, órdenes y detalles de órdenes.
+- Base de datos relacional: SQL Server, base de datos `VentasTransaccional`.
+- API REST externa: productos obtenidos desde DummyJSON.
 
+## Tecnologías utilizadas
 
+- .NET 8
+- Worker Service
+- CsvHelper
+- Microsoft.Data.SqlClient
+- IHttpClientFactory
+- SqlBulkCopy
+- SQL Server
+- ILogger
+- Stopwatch
 
-\## Fuentes de datos
+## Componentes principales
 
+- `CsvExtractor<T>`: extracción desde archivos CSV.
+- `DatabaseExtractor<T>`: extracción desde SQL Server.
+- `ApiExtractor`: consumo de la API REST.
+- `IExtractor<T>`: contrato común de los extractores.
+- `StagingWriter`: carga masiva en tablas staging.
+- `IDimensionLoader`: contrato para la carga de dimensiones.
+- `DimensionLoader`: ejecución de la carga dimensional desde .NET.
+- `Worker.cs`: coordinación del proceso mediante tareas asíncronas.
 
+## Resultados de extracción
 
-\- Archivos CSV: productos, clientes, órdenes y detalles de órdenes.
+Durante la ejecución se procesaron correctamente:
 
-\- Base de datos relacional: SQL Server, base de datos VentasTransaccional.
+- 2,000 productos desde CSV.
+- 5,000 clientes desde CSV.
+- 20,000 órdenes desde CSV.
+- 60,161 detalles de órdenes desde CSV.
+- 20,000 pedidos desde SQL Server.
+- 60,157 detalles de pedidos desde SQL Server.
+- 194 productos desde la API REST.
 
-\- API REST externa: productos obtenidos desde DummyJSON.
+Total procesado: **167,512 registros**.
 
+## Almacenamiento en staging
 
+Los datos extraídos son almacenados en las tablas del esquema `stg` de la base de datos `DW_SistemaVentas`.
 
-\## Tecnologías utilizadas
+La carga hacia staging utiliza `SqlBulkCopy`, procesamiento por lotes y tablas independientes para cada fuente, permitiendo una carga eficiente y escalable.
 
-
-
-\- .NET 8
-
-\- Worker Service
-
-\- CsvHelper
-
-\- Microsoft.Data.SqlClient
-
-\- IHttpClientFactory
-
-\- SqlBulkCopy
-
-\- SQL Server
-
-\- ILogger
-
-\- Stopwatch
-
-
-
-\## Componentes principales
-
-
-
-\- `CsvExtractor<T>`: extracción desde archivos CSV.
-
-\- `DatabaseExtractor<T>`: extracción desde SQL Server.
-
-\- `ApiExtractor`: consumo de la API REST.
-
-\- `IExtractor<T>`: contrato común de los extractores.
-
-\- `StagingWriter`: carga masiva en tablas staging.
-
-\- `Worker.cs`: coordinación del proceso mediante tareas asíncronas.
-
-
-
-\## Resultados
-
-
-
-Durante la ejecución final se procesaron correctamente:
-
-
-
-\- 2,000 productos desde CSV.
-
-\- 5,000 clientes desde CSV.
-
-\- 20,000 órdenes desde CSV.
-
-\- 60,161 detalles de órdenes desde CSV.
-
-\- 20,000 pedidos desde SQL Server.
-
-\- 60,157 detalles de pedidos desde SQL Server.
-
-\- 194 productos desde la API REST.
-
-
-
-Total procesado: \*\*167,512 registros\*\*.
-
-
-
-\## Almacenamiento
-
-
-
-Los datos extraídos fueron almacenados en las tablas del esquema `stg` de la base de datos `DW\_SistemaVentas`, utilizando el filegroup `FG\_STAGING`.
-
-
-
-\## Configuración
-
-
+## Configuración
 
 Las rutas de los archivos, cadenas de conexión y dirección de la API se encuentran centralizadas en `appsettings.json`.
 
-
-
 Para ejecutar el proyecto en otro equipo, deben actualizarse las rutas y cadenas de conexión según el entorno local.
 
+## Carga incremental de dimensiones
 
+En esta etapa se implementó la transformación y carga automática de las dimensiones del Data Warehouse, integrándola con el Worker Service desarrollado en .NET 8.
 
-\## Documentación
+El flujo ejecutado es el siguiente:
 
+```text
+Fuentes CSV, API REST y base de datos externa
+                    ↓
+          Extractores en .NET 8
+                    ↓
+          Tablas del esquema stg
+                    ↓
+       Procedimientos almacenados SQL
+                    ↓
+          Dimensiones del esquema dw
+                    ↓
+        Registro en etl.ControlCarga
+```
 
+## Dimensiones cargadas
 
-La carpeta `Documentacion` contiene:
+- `dw.DimFuenteDatos`
+- `dw.DimEstadoPedido`
+- `dw.DimFecha`
+- `dw.DimCliente`
+- `dw.DimProducto`
 
+## Procedimientos almacenados
 
+Los procedimientos se encuentran documentados en la carpeta `BaseDatos`:
 
-\- Diagrama de arquitectura.
+- `etl.usp_CargarDimFuenteDatos`
+- `etl.usp_CargarDimEstadoPedido`
+- `etl.usp_CargarDimFecha`
+- `etl.usp_CargarDimCliente`
+- `etl.usp_CargarDimProducto`
+- `etl.usp_CargarDimensiones`
 
-\- Diagrama de flujo del proceso de extracción.
+El procedimiento `etl.usp_CargarDimensiones` funciona como orquestador y ejecuta las dimensiones respetando su orden lógico de carga.
 
-\- Documento técnico de la implementación.
+## Estrategia utilizada
 
+La solución utiliza una estrategia híbrida entre .NET 8 y SQL Server.
+
+**.NET 8** se encarga de:
+
+- Extracción desde las diferentes fuentes.
+- Orquestación del proceso ETL.
+- Carga masiva hacia staging.
+- Ejecución de la carga dimensional.
+- Registro de logs.
+- Medición de tiempos.
+- Manejo de errores.
+
+**SQL Server** se encarga de:
+
+- Validación de datos.
+- Limpieza y normalización.
+- Conversión segura de tipos.
+- Eliminación de duplicados.
+- Comparación de registros existentes.
+- Inserción y actualización por conjuntos.
+- Registro de auditoría.
+
+Esta separación permite mantener una solución escalable y mantenible, utilizando cada tecnología en las tareas para las cuales ofrece mejor rendimiento.
+
+## Resultados de las dimensiones
+
+| Dimensión | Total de registros |
+|---|---:|
+| `DimFuenteDatos` | 4 |
+| `DimEstadoPedido` | 5 |
+| `DimFecha` | 732 |
+| `DimCliente` | 5,001 |
+| `DimProducto` | 2,195 |
+
+La dimensión `DimProducto` integra:
+
+- 2,000 productos provenientes de archivos CSV.
+- 194 productos provenientes de la API REST.
+- 1 miembro desconocido utilizado por el modelo dimensional.
+
+## Carga multifuente
+
+La procedencia de los registros se mantiene mediante `FuenteDatosKey`.
+
+Esto permite diferenciar registros con un mismo identificador de origen cuando pertenecen a sistemas diferentes.
+
+Por ejemplo, un producto con identificador `1` proveniente del CSV puede coexistir con un producto con identificador `1` proveniente de la API sin generar conflictos.
+
+## Carga incremental e idempotencia
+
+Los procedimientos fueron diseñados para poder ejecutarse repetidamente sin generar registros duplicados.
+
+Durante las pruebas finales, una reejecución completa obtuvo:
+
+- 47,194 filas leídas.
+- 0 filas insertadas.
+- 0 filas actualizadas.
+- 0 filas rechazadas.
+- Estado `Completada`.
+
+Esto demuestra que el proceso reconoce los datos previamente procesados y evita volver a insertarlos.
+
+## Auditoría del proceso
+
+La tabla `etl.ControlCarga` registra información de cada ejecución dimensional, incluyendo:
+
+- Fuente de datos.
+- Nombre del proceso.
+- Fecha de inicio.
+- Fecha de finalización.
+- Estado de la carga.
+- Filas leídas.
+- Filas insertadas.
+- Filas actualizadas.
+- Filas rechazadas.
+- Mensaje de error.
+
+Los estados utilizados permiten identificar cargas iniciadas, completadas o fallidas.
+
+## Validaciones realizadas
+
+Se realizaron consultas de validación para comprobar:
+
+- Cero grupos duplicados en `DimFuenteDatos`.
+- Cero grupos duplicados en `DimEstadoPedido`.
+- Cero grupos duplicados en `DimFecha`.
+- Cero grupos duplicados en `DimCliente`.
+- Cero grupos duplicados en `DimProducto`.
+- Cero cargas inconclusas.
+- Integridad de los registros cargados.
+- Correcta diferenciación de productos según su fuente.
+- Ejecuciones repetidas sin duplicación.
+
+## Scripts SQL
+
+La carpeta `BaseDatos` contiene:
+
+### `01_Carga_Dimensiones.sql`
+
+Contiene los procedimientos individuales encargados de transformar y cargar las cinco dimensiones.
+
+### `02_Orquestacion_Carga_Dimensiones.sql`
+
+Contiene el procedimiento general `etl.usp_CargarDimensiones`, encargado de coordinar la ejecución y registrar las métricas en `etl.ControlCarga`.
+
+### `03_Validacion_Dimensiones.sql`
+
+Contiene las consultas utilizadas para verificar:
+
+- Población de las dimensiones.
+- Conteos de registros.
+- Distribución por fuente.
+- Ausencia de duplicados.
+- Estado de las ejecuciones.
+
+## Ejecución del proceso
+
+Para ejecutar el proyecto:
+
+1. Crear los procedimientos almacenados mediante los scripts de la carpeta `BaseDatos`.
+2. Configurar las rutas y cadenas de conexión en `appsettings.json`.
+3. Compilar el proyecto en .NET 8.
+4. Ejecutar el Worker Service.
+
+El Worker realiza automáticamente el siguiente flujo:
+
+```text
+Extracción
+    ↓
+Carga en staging
+    ↓
+Transformación
+    ↓
+Carga de dimensiones
+    ↓
+Auditoría
+```
+
+## Documentación
+
+La carpeta `Documentacion` contiene la documentación técnica correspondiente a las diferentes etapas del proyecto.
+
+## Repositorio
+
+Proyecto disponible en:
+
+https://github.com/ambar-c/SistemaVentasETL
