@@ -45,6 +45,7 @@ builder.Services.AddSingleton<IStagingWriter, StagingWriter>();
 
 // Servicio encargado de cargar las dimensiones
 builder.Services.AddSingleton<IDimensionLoader, DimensionLoader>();
+builder.Services.AddSingleton<IFactLoader, FactLoader>();
 
 // Worker Service
 builder.Services.AddHostedService<Worker>();

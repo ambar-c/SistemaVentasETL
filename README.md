@@ -29,6 +29,8 @@ Este proyecto implementa la arquitectura y el proceso ETL multifuente de un Sist
 - `StagingWriter`: carga masiva en tablas staging.
 - `IDimensionLoader`: contrato para la carga de dimensiones.
 - `DimensionLoader`: ejecución de la carga dimensional desde .NET.
+- `IFactLoader`: contrato para la carga de tablas de hechos.
+- `FactLoader`: ejecución de la limpieza y carga de hechos desde .NET.
 - `Worker.cs`: coordinación del proceso mediante tareas asíncronas.
 
 ## Resultados de extracción
@@ -63,7 +65,7 @@ En esta etapa se implementó la transformación y carga automática de las dimen
 
 El flujo ejecutado es el siguiente:
 
-```text
+`
 Fuentes CSV, API REST y base de datos externa
                     ↓
           Extractores en .NET 8
@@ -75,7 +77,7 @@ Fuentes CSV, API REST y base de datos externa
           Dimensiones del esquema dw
                     ↓
         Registro en etl.ControlCarga
-```
+`
 
 ## Dimensiones cargadas
 
@@ -177,7 +179,7 @@ La tabla `etl.ControlCarga` registra información de cada ejecución dimensional
 - Filas rechazadas.
 - Mensaje de error.
 
-Los estados utilizados permiten identificar cargas iniciadas, completadas o fallidas.
+Los estados utilizados permiten identificar cargas iniciadas, completadas, completadas con errores o fallidas.
 
 ## Validaciones realizadas
 
@@ -226,21 +228,177 @@ Para ejecutar el proyecto:
 
 El Worker realiza automáticamente el siguiente flujo:
 
-```text
-Extracción
-    ↓
+```
+Extracción multifuente
+        ↓
 Carga en staging
-    ↓
-Transformación
-    ↓
-Carga de dimensiones
-    ↓
-Auditoría
+        ↓
+Transformación y carga de dimensiones
+        ↓
+Limpieza de FactVenta
+        ↓
+Carga de FactVenta
+        ↓
+Registro en etl.ControlCarga
+        ↓
+Finalización del ETL
 ```
 
 ## Documentación
 
 La carpeta `Documentacion` contiene la documentación técnica correspondiente a las diferentes etapas del proyecto.
+
+# Carga de tablas de hechos
+
+En esta etapa se implementó la limpieza, transformación y carga automática de la tabla de hechos del Data Warehouse, integrándola con el Worker Service desarrollado en .NET 8.
+
+El flujo implementado es el siguiente:
+
+```
+Fuentes CSV, API REST y base de datos externa
+                    ↓
+          Extractores en .NET 8
+                    ↓
+          Tablas del esquema stg
+                    ↓
+          Carga de dimensiones
+                    ↓
+        Limpieza de dw.FactVenta
+                    ↓
+     Transformación y deduplicación
+                    ↓
+          Carga de dw.FactVenta
+                    ↓
+        Registro en etl.ControlCarga
+```
+
+## Tabla de hechos cargada
+
+* `dw.FactVenta`
+
+La tabla almacena una fila por producto incluido en una orden y contiene las claves de las dimensiones relacionadas con fecha, cliente, producto, estado del pedido y fuente de datos.
+
+Las principales medidas almacenadas son:
+
+* `Cantidad`
+* `PrecioUnitarioVenta`
+* `ImporteTotal`
+
+`NumeroOrdenOrigen` se conserva como identificador de la orden de procedencia.
+
+## Proceso de limpieza
+
+Antes de cada carga se ejecuta el procedimiento:
+
+* `etl.usp_LimpiarFactVenta`
+
+Este procedimiento elimina los registros existentes de `dw.FactVenta` mediante `TRUNCATE TABLE`, permitiendo realizar una recarga completa y evitando la acumulación de registros de ejecuciones anteriores.
+
+El proceso incluye manejo transaccional y control de errores mediante `TRY/CATCH`.
+
+## Transformación y carga
+
+La carga de la tabla de hechos se realiza mediante:
+
+* `etl.usp_CargarFactVenta`
+
+Durante el proceso se realizan las siguientes operaciones:
+
+* Conversión y validación de tipos de datos.
+* Eliminación de registros duplicados mediante `ROW_NUMBER()`.
+* Relación de los detalles con las órdenes correspondientes.
+* Resolución de las claves de `DimFecha`, `DimCliente`, `DimProducto` y `DimEstadoPedido`.
+* Asignación de la fuente de datos.
+* Cálculo del precio unitario de venta.
+* Carga final en `dw.FactVenta`.
+
+Durante la validación se identificaron 60,161 registros en `stg.DetallesOrden`. Se detectaron cuatro registros duplicados, por lo que fueron cargadas 60,157 filas únicas en `dw.FactVenta`.
+
+## Validación entre fuentes
+
+También se compararon los datos de ventas procedentes de los archivos CSV con los registros obtenidos desde la base de datos histórica externa.
+
+Se comprobó que:
+
+* Los CSV contienen 60,157 detalles únicos.
+* La base de datos histórica contiene 60,157 detalles.
+* Los 60,157 registros coinciden entre ambas fuentes.
+* Las 20,000 órdenes también coinciden.
+
+Por esta razón, se utiliza el CSV como fuente prioritaria para la carga de `FactVenta`, evitando duplicar las mismas ventas provenientes de dos fuentes diferentes.
+
+## Orquestación de Facts
+
+El procedimiento:
+
+* `etl.usp_CargarFacts`
+
+funciona como orquestador de la etapa y ejecuta automáticamente:
+
+```
+etl.usp_CargarFacts
+        ↓
+etl.usp_LimpiarFactVenta
+        ↓
+etl.usp_CargarFactVenta
+        ↓
+etl.ControlCarga
+```
+
+De esta forma, la limpieza siempre se realiza antes de la carga de la tabla de hechos.
+
+## Control de carga
+
+La ejecución se registra en `etl.ControlCarga`.
+
+En la ejecución final se obtuvo:
+
+* Filas leídas: 60,161
+* Filas insertadas: 60,157
+* Filas descartadas por duplicidad: 4
+* Estado: `Completada`
+* Claves dimensionales desconocidas: 0
+
+## Integración con .NET
+
+Se agregaron los siguientes componentes:
+
+* `IFactLoader`: contrato para ejecutar la carga de tablas de hechos.
+* `FactLoader`: servicio encargado de ejecutar `etl.usp_CargarFacts` desde .NET.
+* `Worker.cs`: actualizado para ejecutar la carga de hechos después de la carga de dimensiones.
+* `Program.cs`: actualizado para registrar `IFactLoader` y `FactLoader` mediante inyección de dependencias.
+
+El flujo final automatizado del Worker Service es:
+
+```
+Extracción multifuente
+        ↓
+Carga a staging
+        ↓
+Carga de dimensiones
+        ↓
+Limpieza de FactVenta
+        ↓
+Carga de FactVenta
+        ↓
+Registro de control
+        ↓
+Finalización del ETL
+```
+
+La ejecución integrada final del proceso ETL terminó correctamente en aproximadamente **17.987 segundos**.
+
+## Scripts SQL de Facts
+
+Los scripts correspondientes a esta etapa se encuentran en:
+
+`BaseDatos/Facts`
+
+* `01_etl.usp_LimpiarFactVenta.sql`
+* `02_etl.usp_CargarFactVenta.sql`
+* `03_etl.usp_CargarFacts.sql`
+* `04_Validacion_Carga_FactVenta.sql`
+
 
 ## Repositorio
 

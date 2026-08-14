@@ -27,10 +27,11 @@ public class Worker : BackgroundService
     // Servicios de carga
     private readonly IStagingWriter _stagingWriter;
     private readonly IDimensionLoader _dimensionLoader;
+    private readonly IFactLoader _factLoader;
 
     private readonly IHostApplicationLifetime
         _hostApplicationLifetime;
-
+    
     public Worker(
         ILogger<Worker> logger,
         IExtractor<Product> productExtractor,
@@ -43,6 +44,7 @@ public class Worker : BackgroundService
         IExtractor<ApiProduct> apiProductExtractor,
         IStagingWriter stagingWriter,
         IDimensionLoader dimensionLoader,
+        IFactLoader factLoader,
         IHostApplicationLifetime hostApplicationLifetime)
     {
         _logger = logger;
@@ -62,6 +64,7 @@ public class Worker : BackgroundService
 
         _stagingWriter = stagingWriter;
         _dimensionLoader = dimensionLoader;
+        _factLoader = factLoader;
 
         _hostApplicationLifetime =
             hostApplicationLifetime;
@@ -265,12 +268,24 @@ public class Worker : BackgroundService
             dimensionsStopwatch.Stop();
 
             _logger.LogInformation(
-                "Transformación y carga de dimensiones completada en {ElapsedMilliseconds} ms.",
-                dimensionsStopwatch.ElapsedMilliseconds);
+            "Transformación y carga de dimensiones completada en {ElapsedMilliseconds} ms.",
+            dimensionsStopwatch.ElapsedMilliseconds);
+
+            /* ============================================================
+               4. LIMPIEZA Y CARGA DE TABLAS DE HECHOS
+               ============================================================ */
+
+            _logger.LogInformation(
+                "Iniciando proceso de carga de tablas de hechos...");
+
+            await _factLoader.LoadFactsAsync(stoppingToken);
+
+            _logger.LogInformation(
+                "Proceso de carga de tablas de hechos finalizado correctamente.");
 
 
             /* =================================================
-               4. FINALIZACIÓN
+               5. FINALIZACIÓN
                ================================================= */
 
             totalStopwatch.Stop();
