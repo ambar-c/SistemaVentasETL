@@ -405,3 +405,10 @@ Los scripts correspondientes a esta etapa se encuentran en:
 Proyecto disponible en:
 
 https://github.com/ambar-c/SistemaVentasETL
+
+
+## Dashboard de Power BI
+
+El proyecto incluye un tablero interactivo desarrollado en Power BI para el análisis de los indicadores de ventas y clientes.
+
+[Ver tablero interactivo en Power BI] https://app.powerbi.com/links/RzpEAaj2EK?ctid=9156d3bf-d39d-42cb-abf6-b7deca4a0892&pbi_source=linkShare
